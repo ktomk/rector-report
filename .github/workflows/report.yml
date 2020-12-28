@@ -11,6 +11,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
+          extensions: xdebug
 
       - uses: pat-s/always-upload-cache@v2.1.3
         with:
@@ -24,4 +25,5 @@ jobs:
             composer-
 
       - run: composer install --prefer-dist --no-progress
-      - run: vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php
+      - run: vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php 2>&1 || true
+      - run: XDEBUG_MODE=develop vendor/rector/rector/bin/rector process --dry-run --xdebug lib/Collaborator.php 2>&1
