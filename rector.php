@@ -3,22 +3,37 @@
 declare(strict_types=1);
 
 use Rector\Core\Configuration\Option;
+use Rector\Generic\ValueObject\PseudoNamespaceToNamespace;
 use Rector\Php74\Rector\Property\TypedPropertyRector;
+use Rector\Renaming\Rector\FileWithoutNamespace\PseudoNamespaceToNamespaceRector;
 use Rector\Set\ValueObject\SetList;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symplify\SymfonyPhpConfig\ValueObjectInliner;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     // get parameters
-    $parameters = $containerConfigurator->parameters();
+    // $parameters = $containerConfigurator->parameters();
 
     // Define what rule sets will be applied
-    $parameters->set(Option::SETS, [
-        SetList::PHPUNIT_60,
-    ]);
+    // $parameters->set(Option::SETS, []);
 
     // get services (needed for register a single rule)
-    // $services = $containerConfigurator->services();
+    $services = $containerConfigurator->services();
 
     // register a single rule
-    // $services->set(TypedPropertyRector::class);
+    $services->set(PseudoNamespaceToNamespaceRector::class)
+        ->call('configure', [[
+            PseudoNamespaceToNamespaceRector::NAMESPACE_PREFIXES_WITH_EXCLUDED_CLASSES => ValueObjectInliner::inline(
+                [
+                    new PseudoNamespaceToNamespace('PHPUnit_', [
+                        'PHPUnit_Framework_MockObject_MockObject',
+                        'PHPUnit_Framework_MockObject_Invocation_Object',
+                        'PHPUnit_Framework_MockObject_Matcher_Invocation',
+                        'PHPUnit_Framework_MockObject_Matcher_Parameters',
+                        'PHPUnit_Framework_MockObject_Stub_Return',
+                        'PHPUnit_Framework_MockObject_Stub',
+                    ]),
+                ]
+            ),
+        ]]);
 };
