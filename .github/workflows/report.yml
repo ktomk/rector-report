@@ -1,6 +1,9 @@
 name: report
 
-on: [push]
+on:
+  push:
+  schedule:
+    - cron:  '0 0,3,6,9,12,15,18,21 * DEC,JAN *'
 
 jobs:
   build:
