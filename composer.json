@@ -1,0 +1,20 @@
+{
+    "name": "ktomk/sandbox-rector-report",
+    "description": "sandboxing for rector <https://github.com/rectorphp/rector/issues/5024>",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "My\\": "lib"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "My\\": "lib"
+        }
+    },
+    "require": {},
+    "require-dev": {
+        "rector/rector": "^0.9.1",
+        "phpunit/phpunit": "^9.5"
+    }
+}

@@ -1,0 +1,27 @@
+name: report
+
+on: [push]
+
+jobs:
+  build:
+    name: Rector Reproduce
+    runs-on: 'ubuntu-18.04'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - uses: pat-s/always-upload-cache@v2.1.3
+        with:
+          path: |
+            ~/.cache/composer
+            vendor
+          key: composer-${{ hashFiles('composer.lock') }}-${{ runner.os }}-
+          restore-keys: |
+            composer-${{ hashFiles('composer.lock') }}-${{ runner.os }}-
+            composer-${{ hashFiles('composer.lock') }}-
+            composer-
+
+      - run: composer install --prefer-dist --no-progress
+      - run: vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php
