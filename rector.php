@@ -25,14 +25,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->call('configure', [[
             PseudoNamespaceToNamespaceRector::NAMESPACE_PREFIXES_WITH_EXCLUDED_CLASSES => ValueObjectInliner::inline(
                 [
-                    new PseudoNamespaceToNamespace('PHPUnit_', [
-                        'PHPUnit_Framework_MockObject_MockObject',
-                        'PHPUnit_Framework_MockObject_Invocation_Object',
-                        'PHPUnit_Framework_MockObject_Matcher_Invocation',
-                        'PHPUnit_Framework_MockObject_Matcher_Parameters',
-                        'PHPUnit_Framework_MockObject_Stub_Return',
-                        'PHPUnit_Framework_MockObject_Stub',
-                    ]),
+                    new PseudoNamespaceToNamespace('Fake_', []),
                 ]
             ),
         ]]);
