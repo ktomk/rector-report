@@ -27,9 +27,10 @@ jobs:
             composer-${{ hashFiles('composer.lock') }}-
             composer-
 
-      - run: composer install --prefer-dist --no-progress
-      - run: vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php 2>&1 || true
-      - run: XDEBUG_MODE=develop vendor/rector/rector/bin/rector process --dry-run --xdebug lib/Collaborator.php 2>&1
+      - run: |
+          composer install --prefer-dist --no-progress
+          vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php 2>&1 || true
+          XDEBUG_MODE=develop vendor/rector/rector/bin/rector process --dry-run --xdebug lib/Collaborator.php 2>&1
 
   fresh:
     name: Rector Reproduce (master)
@@ -54,8 +55,39 @@ jobs:
           composer-${{ hashFiles('composer.lock') }}-
           composer-
 
-    - run: composer install --prefer-dist --no-progress
-    - run: composer remove --dev phpunit/phpunit
-    - run: composer require --dev rector/rector:@dev
-    - run: vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php 2>&1 || true
-    - run: XDEBUG_MODE=develop vendor/rector/rector/bin/rector process --dry-run --xdebug lib/Collaborator.php 2>&1
+    - run: |
+        composer install --prefer-dist --no-progress
+        composer require rector/rector:@dev
+        vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php 2>&1 || true
+        XDEBUG_MODE=develop vendor/rector/rector/bin/rector process --dry-run --xdebug lib/Collaborator.php 2>&1
+
+
+  bugfix:
+    name: Rector Reproduce (bugfix)
+    runs-on: 'ubuntu-18.04'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: xdebug
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pat-s/always-upload-cache@v2.1.3
+        with:
+          path: |
+            ~/.cache/composer
+            vendor
+          key: composer-bugfix-${{ hashFiles('composer.lock') }}-${{ runner.os }}-
+          restore-keys: |
+            composer-bugfix-${{ hashFiles('composer.lock') }}-${{ runner.os }}-
+            composer-bugfix-${{ hashFiles('composer.lock') }}-
+            composer-${{ hashFiles('composer.lock') }}-${{ runner.os }}-
+            composer-${{ hashFiles('composer.lock') }}-
+            composer-
+
+      - run: |
+          composer config repositories.bugfix vcs https://github.com/ktomk/rector
+          composer require rector/rector:dev-patch-resolve-classname --no-progress --update-with-dependencies
+          vendor/rector/rector/bin/rector process --dry-run lib/Collaborator.php 2>&1
