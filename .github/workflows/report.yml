@@ -2,12 +2,10 @@ name: report
 
 on:
   push:
-  schedule:
-    - cron:  '0 0,6,12,18 * DEC,JAN *'
 
 jobs:
   build:
-    name: Rector Reproduce (0.9.3)
+    name: Rector Reproduce (0.9.4)
     runs-on: 'ubuntu-18.04'
     steps:
       - uses: actions/checkout@v2
